@@ -1,21 +1,6 @@
-package org.example.com.automation.domain.model
-
+package org.example.com.automation.data.remote.dto
 
 import kotlinx.serialization.Serializable
-
-// Core models
-data class CompanyTarget(val domain: String)
-
-data class LookalikeDomain(val domainName: String, val companyName: String)
-
-data class ExecutiveLead(
-    val firstName: String,
-    val lastName: String,
-    val title: String,
-    val linkedinUrl: String,
-    val companyDomain: String,
-    val email: String
-)
 
 // Network Specific Data Transfer Objects (DTOs) marked for Ktor Serialization
 @Serializable
