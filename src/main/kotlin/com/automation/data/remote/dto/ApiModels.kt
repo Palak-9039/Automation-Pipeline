@@ -4,25 +4,69 @@ import kotlinx.serialization.Serializable
 
 // Network Specific Data Transfer Objects (DTOs) marked for Ktor Serialization
 @Serializable
-data class OceanLookalikeRequest(val domain: String)
+data class OceanLookalikeRequest(
+    val size: Int = 10,
+    val companiesFilters: OceanFilters
+)
+@Serializable
+data class OceanFilters(
+    val lookalikeDomains: List<String>
+)
 
 @Serializable
-data class OceanLookalikeResponse(val lookalikes: List<String> = emptyList())
+data class OceanCompany(
+    val domain: String? = null,
+    val name: String? = null
+)
 
 @Serializable
-data class ProspeoSearchRequest(val domain: String)
+data class OceanLookalikeResponse(
+    val data: List<OceanCompany> = emptyList()
+)
 
 @Serializable
-data class ProspeoSearchResponse(val response: ProspeoData? = null)
+data class SearchPersonRequest(
+    val page: Int = 1,
+    val filters: Filters
+)
 
 @Serializable
-data class ProspeoData(val email_list: List<ProspeoEmail> = emptyList())
+data class Filters(
+    val company: CompanyFilter,
+)
 
 @Serializable
-data class ProspeoEmail(
-    val email: String,
+data class CompanyFilter(
+    val websites: WebsiteFilter
+)
+
+@Serializable
+data class WebsiteFilter(
+    val include: List<String>
+)
+
+@Serializable
+data class SearchPersonResponse(
+    val error: Boolean = false,
+    val results: List<PersonResult> = emptyList()
+)
+
+@Serializable
+data class PersonResult(
+    val person: Person
+)
+
+@Serializable
+data class Person(
     val first_name: String? = null,
     val last_name: String? = null,
-    val title: String? = null,
-    val linkedin: String? = null
+    val current_job_title: String? = null,
+    val linkedin_url: String? = null,
+    val email: EmailInfo? = null
+)
+
+
+@Serializable
+data class EmailInfo(
+    val email: String? = null
 )

@@ -26,6 +26,8 @@ dependencies {
 
     // Kotlin Coroutines for running async requests
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+
+    implementation("org.slf4j:slf4j-simple:2.0.9")
 }
 
 tasks.test {
@@ -37,6 +39,6 @@ kotlin {
 
 tasks.getByName<Jar>("shadowJar") {
     manifest {
-        attributes["Main-Class"] = "com.automation.MainKt"
+        attributes["Main-Class"] = " org.example.com.automation.presentation.MainKt"
     }
 }
