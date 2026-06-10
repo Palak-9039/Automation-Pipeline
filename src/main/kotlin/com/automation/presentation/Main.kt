@@ -19,13 +19,13 @@ fun main(args: Array<String>) {
     println("Starting Automated Outreach Pipeline for: $targetDomain")
     println("====================================================")
 
-    // 2. Instantiate our concrete clean architecture repository implementation
+    // 2. Instantiating our concrete clean architecture repository implementation
     val pipelineRepository: PipelineRepository = PipelineRepositoryImpl()
 
-    // 3. Wrap our async suspending repository actions inside a blocking coroutine scope
+    // 3. Wrapping our async suspending repository actions inside a blocking coroutine scope
     runBlocking {
         try {
-            //STAGE 1: Discover Lookalike Competitor Domains
+            //STAGE 1: Discovering Lookalike Competitor Domains
             val lookalikes = pipelineRepository.fetchLookalikeDomains(targetDomain)
             if (lookalikes.isEmpty()) {
                 println("Pipeline halted: No lookalike domains discovered.")
@@ -33,7 +33,7 @@ fun main(args: Array<String>) {
             }
             println("Stage 1 Complete: Found ${lookalikes.size} lookalike domains.")
 
-            // 🎬 STAGE 2: Discover Executive Profiles & Consolidated Emails
+            // STAGE 2: Discovering Executive Profiles & Consolidated Emails
             val executiveLeads = pipelineRepository.discoverExecutiveLeads(lookalikes)
             if (executiveLeads.isEmpty()) {
                 println("Pipeline halted: No executive contact entries located.")
@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
             println("====================================================")
             print("Ready to broadcast personalized email sequences via Brevo? Type 'Y' to confirm execution, or any other key to abort: ")
 
-            // Read keyboard input from the terminal window
+            // Reading keyboard input from the terminal window
             val userConfirmation = readLine()?.trim() ?: ""
 
             if (userConfirmation.equals("Y", ignoreCase = true)) {

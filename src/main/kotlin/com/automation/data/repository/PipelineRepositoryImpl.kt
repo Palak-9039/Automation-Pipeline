@@ -94,11 +94,6 @@ class PipelineRepositoryImpl : PipelineRepository {
 
                     val raw = response.bodyAsText()
 
-                    println("RAW RESPONSE:")
-                    println(raw.take(5000))
-
-                    println(raw.substring(0, minOf(raw.length, 2000)))
-
                     val searchResult =
                         Json {
                             ignoreUnknownKeys = true
@@ -107,6 +102,21 @@ class PipelineRepositoryImpl : PipelineRepository {
                     println("People count = ${searchResult.results.size}")
                     for (entry in searchResult.results) {
                         val p = entry.person
+
+
+                        val email = p.email?.email ?: ""
+
+                        println("Email = $email")
+
+                        // Production safeguard:
+                        // Prospeo free tier may return masked emails such as t****@company.com.
+                        // In production we would skip these or use Prospeo reveal credits.
+                        //
+                        // if (email.contains("*")) {
+                        //     println("Skipping masked email: $email")
+                        //     continue
+                        // }
+
 
                         discoveredLeads.add(
                             ExecutiveLead(
@@ -123,8 +133,6 @@ class PipelineRepositoryImpl : PipelineRepository {
                 if (!response.status.isSuccess()) {
                     println("Status: ${response.status}")
                     println(response.bodyAsText())
-                } else {
-                    println("Prospeo API error status: ${response.status}")
                 }
             } catch (e: Exception) {
                 println("Prospeo network exception: ${e.message}")
@@ -151,32 +159,35 @@ class PipelineRepositoryImpl : PipelineRepository {
             """.trimIndent()
 
             try {
+
+                val request = BrevoEmailRequest(
+                    sender = BrevoSender(
+                        email = AppConfig.senderEmail
+                    ),
+                    to = listOf(
+                        BrevoRecipient(
+                            email = contact.email,
+                            name = "${contact.firstName} ${contact.lastName}"
+                        )
+                    ),
+                    subject = "Scale Collaboration Opportunities for ${
+                        contact.companyDomain.substringBefore(".")
+                    }",
+                    htmlContent = "<p>${personalBody.replace("\n", "<br>")}</p>"
+                )
+
+
                 val response = NetworkClient.httpClient.post("https://api.brevo.com/v3/smtp/email") {
                     header("api-key", AppConfig.brevoApiKey)
                     contentType(ContentType.Application.Json)
-                    setBody(
-                        mapOf(
-                            "sender" to mapOf("email" to AppConfig.senderEmail),
-                            "to" to listOf(
-                                mapOf(
-                                    "email" to contact.email,
-                                    "name" to "${contact.firstName} ${contact.lastName}"
-                                )
-                            ),
-                            "subject" to "Scale Collaboration Opportunities for ${
-                                contact.companyDomain.substringBefore(
-                                    "."
-                                )
-                            }",
-                            "htmlContent" to "<p>${personalBody.replace("\n", "<br>")}</p>"
-                        )
-                    )
+                    setBody(request)
                 }
 
                 if (response.status.isSuccess()) {
                     println("Outreach email successfully transmitted to: ${contact.email}")
                 } else {
-                    println("Failed to broadcast to ${contact.email}. Status: ${response.status}")
+                    println("Status: ${response.status}")
+                    println(response.bodyAsText())
                 }
             } catch (e: Exception) {
                 println("Brevo SMTP network engine exception: ${e.message}")

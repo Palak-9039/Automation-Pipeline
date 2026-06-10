@@ -70,3 +70,23 @@ data class Person(
 data class EmailInfo(
     val email: String? = null
 )
+
+
+@Serializable
+data class BrevoEmailRequest(
+    val sender: BrevoSender,
+    val to: List<BrevoRecipient>,
+    val subject: String,
+    val htmlContent: String
+)
+
+@Serializable
+data class BrevoSender(
+    val email: String
+)
+
+@Serializable
+data class BrevoRecipient(
+    val email: String,
+    val name: String? = null
+)
